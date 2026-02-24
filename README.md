@@ -80,7 +80,8 @@ devcenterhouse/
     │   ├── pages/                              # Inertia page components
     │   └── hooks/                              # Custom hooks (2FA, clipboard, etc.)
     ├── database/                               # Migrations, factories, seeders
-    └── tests/                                  # PHPUnit feature + unit tests
+    ├── tests/                                  # PHPUnit feature + unit tests
+    └── README.md
 ```
 
 ---
@@ -153,8 +154,14 @@ cp .env.example .env
 php artisan key:generate
 php artisan migrate --seed
 npm run dev
-# In separate terminal:
-php artisan serve
+```
+
+Run each of the following in a **separate terminal**:
+
+```bash
+php artisan serve          # Laravel app  — http://localhost:8000
+php artisan queue:work     # Queue worker — processes enquiry emails
+php artisan reverb:start   # WebSocket server — real-time notifications
 ```
 
 ### Laravel + React Features
@@ -199,12 +206,22 @@ php artisan serve
 
 ---
 
-## Creating an Admin User (Stack 1)
+## Creating an Admin User
+
+### Stack 1 — NestJS
 
 ```bash
 # Register via UI, then promote in the database
 psql -U postgres -d properties_db
 UPDATE users SET role = 'admin' WHERE email = 'your@email.com';
+```
+
+### Stack 2 — Laravel
+
+```bash
+# Register via UI, then promote in the database
+php artisan tinker
+>>> \App\Models\User::where('email', 'your@email.com')->update(['role' => 'admin']);
 ```
 
 ---
@@ -223,6 +240,28 @@ See [`properties-listing-api/.env.example`](properties-listing-api/.env.example)
 | `JWT_SECRET`        | JWT signing secret               | *(required)*             |
 | `ALLOWED_ORIGINS`   | CORS whitelist (comma-separated) | `http://localhost:4200`  |
 | `PORT`              | API listen port                  | `3000`                   |
+
+---
+
+## Environment Variables (Stack 2)
+
+See [`property-listing-laravel-react-inertia/.env.example`](property-listing-laravel-react-inertia/.env.example) for the full list.
+
+| Variable             | Description                          | Default                    |
+| -------------------- | ------------------------------------ | -------------------------- |
+| `APP_KEY`            | Laravel application key              | *(generate with artisan)*  |
+| `APP_URL`            | Application base URL                 | `http://localhost:8000`    |
+| `DB_CONNECTION`      | Database driver                      | `pgsql`                    |
+| `DB_HOST`            | Database host                        | `127.0.0.1`                |
+| `DB_PORT`            | Database port                        | `5432`                     |
+| `DB_DATABASE`        | Database name                        | `property_management`      |
+| `DB_USERNAME`        | Database username                    | `postgres`                 |
+| `DB_PASSWORD`        | Database password                    | *(required)*               |
+| `BROADCAST_CONNECTION` | WebSocket driver (use `reverb` for real-time) | `log`            |
+| `QUEUE_CONNECTION`   | Queue driver                         | `database`                 |
+| `MAIL_MAILER`        | Mail driver (use `smtp` in prod)     | `log`                      |
+| `REVERB_APP_KEY`     | Reverb app key                       | *(generate with artisan)*  |
+| `REVERB_APP_SECRET`  | Reverb app secret                    | *(generate with artisan)*  |
 
 ---
 
