@@ -1,16 +1,26 @@
 # DCH Property Listing — Enterprise Platform
 
-A full-stack, enterprise-grade property listing platform for the Irish market. Built with **NestJS**, **Angular 21**, **PostgreSQL**, and **Docker Compose**.
+A full-stack, enterprise-grade property listing platform for the Irish market, implemented in **two separate stacks** to demonstrate full-spectrum engineering capability.
 
 ---
 
-## Overview
+## Two Implementations, One Domain
 
-DCH Property Listing enables users to search, filter, and save properties for rent or sale across Ireland. Administrators can manage the full property catalogue, view analytics, and control user roles — all from a dedicated admin panel.
+| | NestJS + Angular (Decoupled) | Laravel + React (Monolith) |
+| --- | --- | --- |
+| **Backend** | NestJS 11, TypeORM, PostgreSQL | Laravel 12, Eloquent, PostgreSQL |
+| **Frontend** | Angular 21, Tailwind CSS 4, SSR | React 19, Inertia.js, Tailwind CSS 4 |
+| **Auth** | JWT (7-day token, role-based) | Laravel Fortify (sessions, 2FA) |
+| **Real-time** | — | Laravel Reverb + WebSockets |
+| **API** | REST + Swagger/OpenAPI docs | Inertia (server-driven SPA, no separate API) |
+| **Testing** | Jest + Vitest | PHPUnit 11 (SQLite in-memory) |
+| **Container** | Docker Compose | — |
 
 ---
 
 ## Architecture
+
+### Stack 1 — Decoupled (NestJS + Angular)
 
 ```
 ┌─────────────────────────────────────────────────────────┐
@@ -19,139 +29,205 @@ DCH Property Listing enables users to search, filter, and save properties for re
 │  ┌──────────────┐    ┌──────────────┐  ┌─────────────┐  │
 │  │  Angular UI  │───▶│  NestJS API  │─▶│  PostgreSQL  │  │
 │  │  Port: 4200  │    │  Port: 3000  │  │  Port: 5432  │  │
+│  │  SSR + lazy  │    │  REST + JWT  │  │  TypeORM     │  │
 │  └──────────────┘    └──────────────┘  └─────────────┘  │
 └─────────────────────────────────────────────────────────┘
 ```
 
-| Layer      | Technology              | Version  |
-|------------|-------------------------|----------|
-| Frontend   | Angular + Tailwind CSS  | 21.x / 4.x |
-| Backend    | NestJS + TypeORM        | 11.x / 0.3.x |
-| Database   | PostgreSQL              | 16-alpine |
-| Auth       | JWT + bcryptjs          | 7d expiry |
-| Container  | Docker Compose          | —         |
+### Stack 2 — Monolith (Laravel + React + Inertia)
+
+```
+┌───────────────────────────────────────────────────┐
+│                 Laravel Application                │
+│                                                   │
+│  React (Inertia SPA) ◀──▶ Laravel Controllers    │
+│                               │                  │
+│                          PostgreSQL               │
+│                               │                  │
+│                    Laravel Reverb (WebSocket)     │
+└───────────────────────────────────────────────────┘
+```
 
 ---
 
-## Project Structure
+## Repository Structure
 
 ```
 devcenterhouse/
-├── docker-compose.yml              # Orchestrates all three services
-├── properties-listing-api/         # NestJS REST API
+├── docker-compose.yml                          # Runs the NestJS stack
+├── properties-listing-api/                     # Stack 1 — NestJS REST API
 │   ├── src/
-│   │   ├── auth/                   # JWT auth, guards, decorators
-│   │   ├── properties/             # Property CRUD + filtering
-│   │   ├── users/                  # User management
-│   │   └── saved-properties/       # Saved/favourite properties
+│   │   ├── auth/                               # JWT auth, guards, decorators, strategies
+│   │   ├── properties/                         # Property CRUD, filtering, seeder
+│   │   ├── users/                              # User management
+│   │   └── saved-properties/                   # Saved/favourite properties
 │   └── README.md
-├── properties-listing-ui/          # Angular 21 SPA + SSR
+├── properties-listing-ui/                      # Stack 1 — Angular 21 SPA + SSR
 │   ├── src/app/
-│   │   ├── core/                   # Services, guards, interceptors
-│   │   ├── features/               # Page-level components
-│   │   └── shared/                 # Navbar, Footer
+│   │   ├── core/                               # Services, guards, interceptors, models
+│   │   ├── features/                           # All page components (lazy-loaded)
+│   │   └── shared/                             # Navbar, Footer
 │   └── README.md
-└── property-listing-laravel-react-inertia/   # Alternative stack (reference)
+└── property-listing-laravel-react-inertia/     # Stack 2 — Laravel + React monolith
+    ├── app/                                    # Laravel PHP backend
+    │   ├── Http/Controllers/                   # PropertyController (full CRUD + enquiries)
+    │   ├── Models/                             # Property, Enquiry, User
+    │   ├── Events/                             # EnquiryReceived (broadcasts via Reverb)
+    │   ├── Mail/                               # EnquiryMailable (queued email)
+    │   └── Policies/                           # PropertyPolicy (authorization)
+    ├── resources/js/                           # React + TypeScript frontend (Inertia)
+    │   ├── components/                         # Shared components + Radix UI primitives
+    │   ├── pages/                              # Inertia page components
+    │   └── hooks/                              # Custom hooks (2FA, clipboard, etc.)
+    ├── database/                               # Migrations, factories, seeders
+    └── tests/                                  # PHPUnit feature + unit tests
 ```
 
 ---
 
-## Quick Start
+## Stack 1 — NestJS + Angular
 
-### Option 1 — Docker Compose (recommended)
+### Quick Start (Docker Compose)
 
 ```bash
-# Clone and configure
 cp properties-listing-api/.env.example properties-listing-api/.env
-# Edit JWT_SECRET in .env
+# Set JWT_SECRET in .env
 
-# Start all services
 docker-compose up --build
 
-# Seed the database
+# Seed demo data
 curl -X POST http://localhost:3000/api/properties/seed
 ```
 
-| Service     | URL                              |
-|-------------|----------------------------------|
-| Frontend    | http://localhost:4200            |
-| API         | http://localhost:3000/api        |
-| Swagger UI  | http://localhost:3000/api/docs   |
+| Service    | URL                                      |
+| ---------- | ---------------------------------------- |
+| Frontend   | <http://localhost:4200>                  |
+| API        | <http://localhost:3000/api>              |
+| Swagger UI | <http://localhost:3000/api/docs>         |
 
-### Option 2 — Local Development
+### Quick Start (Local Dev)
 
 ```bash
 # Backend
-cd properties-listing-api
-npm install
-cp .env.example .env   # fill in your values
-npm run start:dev
+cd properties-listing-api && npm install && npm run start:dev
 
 # Frontend (separate terminal)
-cd properties-listing-ui
-npm install
-ng serve
+cd properties-listing-ui && npm install && ng serve
 ```
 
----
+### NestJS + Angular Features
 
-## Key Features
+#### Public Access
 
-### Public
-- Browse properties with server-side pagination (default 12/page)
+- Property listing with server-side pagination (default 12/page, max 100)
 - Full-text search across title, address, city, county
-- Filter by type, county, price range, bedrooms, bathrooms, status
-- Sort by price, date, size, or name
-- View property details with image gallery
+- Filters: type, county, price range, bedrooms, bathrooms, status
+- Sort by price, date, size, name (ASC / DESC)
+- Property detail page with image gallery
 - Landing page, About, Contact, 404
 
-### Authenticated Users
-- Register & login (JWT)
-- Save / unsave properties (heart icon on cards)
-- User dashboard — view all saved properties
+#### Authenticated User Access
 
-### Admin
+- Register & login (JWT, 7-day expiry)
+- Save / unsave properties (heart button on cards)
+- User dashboard — saved properties grid
+
+#### Admin Panel
+
 - Property CRUD (create, edit, delete)
-- Analytics dashboard (totals, new this month, featured)
-- User management — view all users and change roles
-- Admin route guard — non-admins are redirected
+- Analytics dashboard (totals, per-status, featured, new this month)
+- User management — list users, promote/demote roles
+- Admin route guard — non-admins redirected
 
 ---
 
-## Creating an Admin User
+## Stack 2 — Laravel + React + Inertia
 
-After seeding, register via the UI, then promote via the API:
+### Quick Start
 
 ```bash
-# 1. Register normally via /auth/register
-# 2. Get the user ID from GET /api/users (log in as admin first)
-# 3. PATCH /api/users/:id/role  { "role": "admin" }
+cd property-listing-laravel-react-inertia
+composer install
+npm install
+cp .env.example .env
+php artisan key:generate
+php artisan migrate --seed
+npm run dev
+# In separate terminal:
+php artisan serve
+```
 
-# Or directly in the database
+### Laravel + React Features
+
+#### Public
+
+- Landing page — hero search, live stats, featured grid, browse-by-type
+- Property listing with debounced search, filters, Inertia pagination (no full reload)
+- Property detail — image gallery, full spec, enquiry form
+- Enquiry form — rate-limited (5/min per IP), triggers queued email + WebSocket broadcast
+- SEO — Open Graph tags, meta descriptions, canonical links on all public pages
+- Auto-generated XML sitemap at `/sitemap.xml`
+
+#### Admin
+
+- Dashboard — stats, recent listings, recent enquiries, live unread-enquiry badge
+- Real-time notifications — Reverb WebSocket broadcasts `EnquiryReceived`; Sonner toast appears instantly
+- Property CRUD via `/admin/properties`
+- Enquiry management — paginated list, mark as read
+- Flash toast notifications throughout
+
+#### Auth (Laravel Fortify)
+
+- Email + password login
+- Two-factor authentication (TOTP)
+- Email verification
+- Password reset
+
+---
+
+## Key Differences Between Stacks
+
+| Concern | NestJS + Angular | Laravel + React |
+| --- | --- | --- |
+| API style | REST (decoupled, Swagger docs) | Inertia (server-driven, no separate API) |
+| Auth mechanism | Stateless JWT | Stateful sessions (Fortify) |
+| Real-time | Not included | Reverb WebSockets + Echo |
+| 2FA | Role-based only | Full TOTP 2FA |
+| SEO | Angular SSR | Native server-side rendering via Blade/Inertia |
+| DB interaction | TypeORM (query builder) | Eloquent ORM (scopes, accessors) |
+| Testing | Jest + Vitest | PHPUnit (SQLite in-memory, 15+ test files) |
+
+---
+
+## Creating an Admin User (Stack 1)
+
+```bash
+# Register via UI, then promote in the database
 psql -U postgres -d properties_db
 UPDATE users SET role = 'admin' WHERE email = 'your@email.com';
 ```
 
 ---
 
-## Environment Variables
+## Environment Variables (Stack 1)
 
 See [`properties-listing-api/.env.example`](properties-listing-api/.env.example) for the full list.
 
-| Variable          | Description                          | Default                       |
-|-------------------|--------------------------------------|-------------------------------|
-| `DATABASE_HOST`   | Postgres host                        | `localhost`                   |
-| `DATABASE_PORT`   | Postgres port                        | `5432`                        |
-| `DATABASE_USER`   | Postgres username                    | `postgres`                    |
-| `DATABASE_PASSWORD` | Postgres password                  | `postgres`                    |
-| `DATABASE_NAME`   | Database name                        | `properties_db`               |
-| `JWT_SECRET`      | Secret for signing JWT tokens        | *(required in production)*    |
-| `ALLOWED_ORIGINS` | CORS whitelist (comma-separated)     | `http://localhost:4200`       |
-| `PORT`            | API listen port                      | `3000`                        |
+| Variable            | Description                      | Default                  |
+| ------------------- | -------------------------------- | ------------------------ |
+| `DATABASE_HOST`     | Postgres host                    | `localhost`              |
+| `DATABASE_PORT`     | Postgres port                    | `5432`                   |
+| `DATABASE_USER`     | Postgres username                | `postgres`               |
+| `DATABASE_PASSWORD` | Postgres password                | `postgres`               |
+| `DATABASE_NAME`     | Database name                    | `properties_db`          |
+| `JWT_SECRET`        | JWT signing secret               | *(required)*             |
+| `ALLOWED_ORIGINS`   | CORS whitelist (comma-separated) | `http://localhost:4200`  |
+| `PORT`              | API listen port                  | `3000`                   |
 
 ---
 
 ## Sub-project Documentation
 
-- [Backend (NestJS API)](properties-listing-api/README.md)
-- [Frontend (Angular UI)](properties-listing-ui/README.md)
+- [Stack 1 — NestJS API](properties-listing-api/README.md)
+- [Stack 1 — Angular UI](properties-listing-ui/README.md)
+- [Stack 2 — Laravel + React + Inertia](property-listing-laravel-react-inertia/README.md)
