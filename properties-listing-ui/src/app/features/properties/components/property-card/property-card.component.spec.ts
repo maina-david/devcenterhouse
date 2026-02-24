@@ -1,4 +1,6 @@
 import { TestBed } from '@angular/core/testing';
+import { provideRouter } from '@angular/router';
+import { provideHttpClient } from '@angular/common/http';
 import { PropertyCardComponent } from './property-card.component';
 import { Property } from '../../../../core/models/property.model';
 
@@ -32,6 +34,7 @@ describe('PropertyCardComponent', () => {
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       imports: [PropertyCardComponent],
+      providers: [provideRouter([]), provideHttpClient()],
     }).compileComponents();
 
     const fixture = TestBed.createComponent(PropertyCardComponent);
