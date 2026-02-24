@@ -1,6 +1,6 @@
-# DCH Property Listing — Enterprise Platform
+# DCH Property Listing
 
-A full-stack, enterprise-grade property listing platform for the Irish market, implemented in **two separate stacks** to demonstrate full-spectrum engineering capability.
+A property listing platform for the Irish market, implemented in **two separate stacks** to demonstrate full-spectrum engineering capability.
 
 ---
 
