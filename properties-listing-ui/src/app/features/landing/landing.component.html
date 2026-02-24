@@ -1,0 +1,113 @@
+<!-- Hero -->
+<section class="relative bg-gray-900 text-white overflow-hidden" style="min-height: 560px">
+  <div class="absolute inset-0 bg-gradient-to-br from-gray-900 via-gray-800 to-pink-950 opacity-90"></div>
+  <div class="absolute inset-0 opacity-10"
+    style="background-image: url('https://picsum.photos/seed/hero/1600/900'); background-size: cover; background-position: center">
+  </div>
+
+  <div class="relative max-w-4xl mx-auto px-4 py-24 text-center">
+    <span class="inline-block mb-4 px-4 py-1.5 rounded-full text-xs font-semibold uppercase tracking-wider text-white"
+      style="background-color: rgba(238,0,136,0.3); border: 1px solid rgba(238,0,136,0.5)">
+      Ireland's #1 Property Platform
+    </span>
+    <h1 class="text-4xl sm:text-5xl lg:text-6xl font-extrabold leading-tight mb-6">
+      Find Your Perfect<br />
+      <span style="color: #EE0088">Home in Ireland</span>
+    </h1>
+    <p class="text-xl text-gray-300 mb-10 max-w-2xl mx-auto">
+      Search thousands of properties for rent and sale across every county — from Dublin city apartments to Kerry countryside homes.
+    </p>
+
+    <div class="flex flex-col sm:flex-row gap-3 max-w-2xl mx-auto">
+      <input
+        [(ngModel)]="searchQuery"
+        (keyup.enter)="onSearch()"
+        type="text"
+        placeholder="Search by city, county or address..."
+        class="flex-1 px-5 py-4 rounded-xl text-gray-900 text-base focus:outline-none focus:ring-2 shadow-lg"
+        style="--tw-ring-color: #EE0088"
+      />
+      <button
+        (click)="onSearch()"
+        class="px-8 py-4 rounded-xl text-white font-semibold text-base transition-opacity hover:opacity-90 shadow-lg shrink-0"
+        style="background-color: #EE0088"
+      >
+        Search
+      </button>
+    </div>
+  </div>
+</section>
+
+<!-- Stats strip -->
+<section class="bg-white border-b border-gray-100">
+  <div class="max-w-5xl mx-auto px-4 py-8 grid grid-cols-3 gap-4 text-center">
+    <div>
+      <p class="text-3xl font-extrabold text-gray-900">1,200+</p>
+      <p class="text-sm text-gray-500 mt-1">Active Listings</p>
+    </div>
+    <div>
+      <p class="text-3xl font-extrabold" style="color: #EE0088">26</p>
+      <p class="text-sm text-gray-500 mt-1">Counties Covered</p>
+    </div>
+    <div>
+      <p class="text-3xl font-extrabold text-gray-900">8,000+</p>
+      <p class="text-sm text-gray-500 mt-1">Happy Tenants</p>
+    </div>
+  </div>
+</section>
+
+<!-- Featured properties -->
+@if (featuredProperties().length > 0) {
+  <section class="max-w-7xl mx-auto px-4 py-16">
+    <div class="flex items-end justify-between mb-8">
+      <div>
+        <h2 class="text-2xl font-bold text-gray-900">Featured Properties</h2>
+        <p class="text-gray-500 mt-1">Hand-picked listings from across Ireland</p>
+      </div>
+      <a routerLink="/properties" class="text-sm font-medium transition-colors hover:underline" style="color: #EE0088">
+        View all →
+      </a>
+    </div>
+    <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+      @for (property of featuredProperties(); track property.id) {
+        <app-property-card [property]="property" />
+      }
+    </div>
+  </section>
+}
+
+<!-- How it works -->
+<section class="bg-gray-50 py-16">
+  <div class="max-w-5xl mx-auto px-4">
+    <div class="text-center mb-12">
+      <h2 class="text-2xl font-bold text-gray-900">How It Works</h2>
+      <p class="text-gray-500 mt-2">Find your new home in three simple steps</p>
+    </div>
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+      @for (step of [
+        { icon: '🔍', title: 'Search', desc: 'Use our powerful filters to find properties by location, type, price and size.' },
+        { icon: '📋', title: 'Browse & Compare', desc: 'View detailed listings with photos, floor plans and neighbourhood info.' },
+        { icon: '🏡', title: 'Move In', desc: 'Contact landlords or agents directly and start your new chapter.' }
+      ]; track step.title) {
+        <div class="text-center">
+          <div class="text-5xl mb-4">{{ step.icon }}</div>
+          <h3 class="font-semibold text-gray-900 text-lg mb-2">{{ step.title }}</h3>
+          <p class="text-gray-500 text-sm leading-relaxed">{{ step.desc }}</p>
+        </div>
+      }
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section class="py-16 text-white text-center" style="background-color: #EE0088">
+  <div class="max-w-2xl mx-auto px-4">
+    <h2 class="text-3xl font-bold mb-4">Are You a Landlord?</h2>
+    <p class="text-lg opacity-90 mb-8">List your property with DCH and reach thousands of verified tenants across Ireland.</p>
+    <a routerLink="/contact"
+      class="inline-block px-8 py-4 rounded-xl font-semibold text-base bg-white transition-colors hover:bg-gray-50"
+      style="color: #EE0088">
+      List Your Property
+    </a>
+  </div>
+</section>

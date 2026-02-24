@@ -1,0 +1,118 @@
+<article
+  [routerLink]="['/properties', property.id]"
+  class="bg-white rounded-xl shadow-md hover:shadow-xl transition-shadow duration-300 overflow-hidden flex flex-col group cursor-pointer"
+>
+  <div class="relative overflow-hidden h-52">
+    <img
+      [src]="imageUrl"
+      [alt]="property.title"
+      class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+      loading="lazy"
+    />
+    @if (property.isFeatured) {
+      <span
+        class="absolute top-3 left-3 text-white text-xs font-semibold px-2.5 py-1 rounded-full"
+        style="background-color: #EE0088"
+      >
+        Featured
+      </span>
+    }
+    <span
+      class="absolute top-3 right-3 text-xs font-semibold px-2.5 py-1 rounded-full"
+      [class]="property.status === 'for_rent' ? 'bg-green-100 text-green-700' : 'bg-blue-100 text-blue-700'"
+    >
+      {{ property.status === 'for_rent' ? 'For Rent' : 'For Sale' }}
+    </span>
+
+    @if (authService.isAuthenticated()) {
+      <button
+        (click)="toggleSave($event)"
+        class="absolute bottom-3 right-3 w-8 h-8 rounded-full bg-white shadow-md flex items-center justify-center transition-transform hover:scale-110"
+        [title]="savedService.isSaved(property.id) ? 'Remove from saved' : 'Save property'"
+      >
+        <svg
+          class="w-4 h-4"
+          [class]="savedService.isSaved(property.id) ? 'fill-current text-pink-600' : 'fill-none text-gray-400'"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+        >
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+            d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+        </svg>
+      </button>
+    }
+  </div>
+
+  <div class="p-4 flex flex-col flex-1">
+    <div class="flex items-center justify-between mb-2">
+      <span class="text-xl font-bold" style="color: #EE0088">{{ priceLabel }}</span>
+      <span class="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded-full font-medium">
+        {{ typeLabel }}
+      </span>
+    </div>
+
+    <h3 class="font-semibold text-gray-900 text-base leading-snug mb-1 line-clamp-2">
+      {{ property.title }}
+    </h3>
+
+    <p class="text-gray-500 text-sm mb-3 flex items-center gap-1">
+      <svg class="w-3.5 h-3.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          stroke-width="2"
+          d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"
+        />
+        <path
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          stroke-width="2"
+          d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
+        />
+      </svg>
+      {{ property.address }}, {{ property.city }}, {{ property.county }}
+    </p>
+
+    <div class="mt-auto pt-3 border-t border-gray-100 flex items-center gap-4 text-gray-600 text-sm">
+      @if (property.bedrooms !== null && property.bedrooms !== undefined) {
+        <span class="flex items-center gap-1.5">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"
+            />
+          </svg>
+          {{ property.bedrooms === 0 ? 'Studio' : property.bedrooms + ' Bed' }}
+        </span>
+      }
+      @if (property.bathrooms) {
+        <span class="flex items-center gap-1.5">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M4 12h16M4 12a8 8 0 0116 0M4 12a8 8 0 0016 0M3 21h18M3 7h18"
+            />
+          </svg>
+          {{ property.bathrooms }} Bath
+        </span>
+      }
+      @if (property.areaSqft) {
+        <span class="flex items-center gap-1.5 ml-auto">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"
+            />
+          </svg>
+          {{ property.areaSqft }} sqft
+        </span>
+      }
+    </div>
+  </div>
+</article>

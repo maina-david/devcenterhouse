@@ -1,0 +1,141 @@
+<nav class="bg-white border-b border-gray-100 sticky top-0 z-50 shadow-sm">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="flex items-center justify-between h-16">
+
+      <!-- Logo -->
+      <a routerLink="/" class="flex items-center gap-2.5 shrink-0">
+        <div class="w-8 h-8 rounded-lg flex items-center justify-center" style="background-color: #EE0088">
+          <svg class="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 20 20">
+            <path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z" />
+          </svg>
+        </div>
+        <span class="font-bold text-gray-900 text-lg leading-none">
+          DCH<span style="color: #EE0088"> Property</span>
+        </span>
+      </a>
+
+      <!-- Desktop nav -->
+      <div class="hidden md:flex items-center gap-1">
+        <a routerLink="/properties" routerLinkActive="text-pink-600 bg-pink-50"
+          class="px-4 py-2 rounded-lg text-sm font-medium text-gray-600 hover:text-gray-900 hover:bg-gray-50 transition-colors">
+          Properties
+        </a>
+        <a routerLink="/about" routerLinkActive="text-pink-600 bg-pink-50"
+          class="px-4 py-2 rounded-lg text-sm font-medium text-gray-600 hover:text-gray-900 hover:bg-gray-50 transition-colors">
+          About
+        </a>
+        <a routerLink="/contact" routerLinkActive="text-pink-600 bg-pink-50"
+          class="px-4 py-2 rounded-lg text-sm font-medium text-gray-600 hover:text-gray-900 hover:bg-gray-50 transition-colors">
+          Contact
+        </a>
+      </div>
+
+      <!-- Auth section -->
+      <div class="hidden md:flex items-center gap-3">
+        @if (!authService.isAuthenticated()) {
+          <a routerLink="/auth/login"
+            class="px-4 py-2 text-sm font-medium text-gray-700 hover:text-gray-900 transition-colors">
+            Log in
+          </a>
+          <a routerLink="/auth/register"
+            class="px-4 py-2 rounded-lg text-sm font-medium text-white transition-colors"
+            style="background-color: #EE0088">
+            Register
+          </a>
+        } @else {
+          <div class="relative">
+            <button (click)="toggleUserMenu()"
+              class="flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors">
+              <div class="w-7 h-7 rounded-full flex items-center justify-center text-white text-xs font-bold"
+                style="background-color: #EE0088">
+                {{ authService.currentUser()?.firstName?.charAt(0) }}
+              </div>
+              <span>{{ authService.currentUser()?.firstName }}</span>
+              <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+              </svg>
+            </button>
+
+            @if (userMenuOpen()) {
+              <div class="absolute right-0 mt-1 w-48 bg-white rounded-xl shadow-lg border border-gray-100 py-1 z-50">
+                <a routerLink="/dashboard" (click)="userMenuOpen.set(false)"
+                  class="flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                      d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+                  </svg>
+                  Saved Properties
+                </a>
+                @if (authService.isAdmin()) {
+                  <a routerLink="/admin" (click)="userMenuOpen.set(false)"
+                    class="flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                    </svg>
+                    Admin Panel
+                  </a>
+                }
+                <div class="border-t border-gray-100 my-1"></div>
+                <button (click)="logout()"
+                  class="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-red-600 hover:bg-red-50 text-left">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                      d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                  </svg>
+                  Sign out
+                </button>
+              </div>
+            }
+          </div>
+        }
+      </div>
+
+      <!-- Mobile hamburger -->
+      <button (click)="toggleMobile()" class="md:hidden p-2 rounded-lg text-gray-500 hover:bg-gray-100">
+        @if (mobileOpen()) {
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        } @else {
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+          </svg>
+        }
+      </button>
+    </div>
+  </div>
+
+  <!-- Mobile menu -->
+  @if (mobileOpen()) {
+    <div class="md:hidden border-t border-gray-100 bg-white px-4 pb-4 pt-2">
+      <div class="flex flex-col gap-1">
+        <a routerLink="/properties" (click)="mobileOpen.set(false)"
+          class="px-4 py-2.5 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50">Properties</a>
+        <a routerLink="/about" (click)="mobileOpen.set(false)"
+          class="px-4 py-2.5 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50">About</a>
+        <a routerLink="/contact" (click)="mobileOpen.set(false)"
+          class="px-4 py-2.5 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50">Contact</a>
+
+        <div class="border-t border-gray-100 my-2"></div>
+
+        @if (!authService.isAuthenticated()) {
+          <a routerLink="/auth/login" (click)="mobileOpen.set(false)"
+            class="px-4 py-2.5 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50">Log in</a>
+          <a routerLink="/auth/register" (click)="mobileOpen.set(false)"
+            class="px-4 py-2.5 rounded-lg text-sm font-medium text-white text-center"
+            style="background-color: #EE0088">Register</a>
+        } @else {
+          <a routerLink="/dashboard" (click)="mobileOpen.set(false)"
+            class="px-4 py-2.5 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50">Saved Properties</a>
+          @if (authService.isAdmin()) {
+            <a routerLink="/admin" (click)="mobileOpen.set(false)"
+              class="px-4 py-2.5 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50">Admin Panel</a>
+          }
+          <button (click)="logout()"
+            class="px-4 py-2.5 rounded-lg text-sm font-medium text-red-600 hover:bg-red-50 text-left">Sign out</button>
+        }
+      </div>
+    </div>
+  }
+</nav>

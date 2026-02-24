@@ -1,0 +1,152 @@
+<!-- Back link -->
+<div class="max-w-5xl mx-auto px-4 pt-6">
+  <a
+    routerLink="/properties"
+    class="inline-flex items-center gap-2 text-sm font-medium text-gray-600 hover:text-gray-900 transition-colors"
+  >
+    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+    </svg>
+    Back to listings
+  </a>
+</div>
+
+<!-- Loading skeleton -->
+@if (loading()) {
+  <div class="max-w-5xl mx-auto px-4 py-8 animate-pulse">
+    <div class="bg-gray-200 rounded-xl h-80 mb-6"></div>
+    <div class="h-8 bg-gray-200 rounded w-2/3 mb-4"></div>
+    <div class="h-5 bg-gray-200 rounded w-1/3 mb-6"></div>
+    <div class="grid grid-cols-3 gap-4">
+      <div class="h-20 bg-gray-200 rounded-lg"></div>
+      <div class="h-20 bg-gray-200 rounded-lg"></div>
+      <div class="h-20 bg-gray-200 rounded-lg"></div>
+    </div>
+  </div>
+}
+
+<!-- Error state -->
+@if (error()) {
+  <div class="max-w-5xl mx-auto px-4 py-16 text-center">
+    <p class="text-red-600 font-medium mb-4">{{ error() }}</p>
+    <a routerLink="/properties" class="text-sm underline text-gray-600">Return to listings</a>
+  </div>
+}
+
+<!-- Property detail -->
+@if (property(); as p) {
+  <div class="max-w-5xl mx-auto px-4 py-6 pb-16">
+
+    <!-- Hero image -->
+    <div class="rounded-xl overflow-hidden h-80 mb-6 bg-gray-100">
+      <img
+        [src]="p.images.length ? p.images[0] : 'https://picsum.photos/seed/' + p.id + '/1200/600'"
+        [alt]="p.title"
+        class="w-full h-full object-cover"
+      />
+    </div>
+
+    <!-- Header row -->
+    <div class="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3 mb-6">
+      <div>
+        <h1 class="text-2xl font-bold text-gray-900 mb-1">{{ p.title }}</h1>
+        <p class="text-gray-500 flex items-center gap-1">
+          <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+          </svg>
+          {{ p.address }}, {{ p.city }}, {{ p.county }}
+          @if (p.eircode) { <span class="ml-1 text-gray-400">· {{ p.eircode }}</span> }
+        </p>
+      </div>
+      <div class="flex flex-col items-end gap-2 shrink-0">
+        <span class="text-3xl font-bold" style="color: #EE0088">{{ priceLabel }}</span>
+        <div class="flex gap-2">
+          @if (p.isFeatured) {
+            <span class="text-white text-xs font-semibold px-2.5 py-1 rounded-full" style="background-color: #EE0088">
+              Featured
+            </span>
+          }
+          <span
+            class="text-xs font-semibold px-2.5 py-1 rounded-full"
+            [class]="p.status === 'for_rent' ? 'bg-green-100 text-green-700' : 'bg-blue-100 text-blue-700'"
+          >
+            {{ p.status === 'for_rent' ? 'For Rent' : 'For Sale' }}
+          </span>
+          <span class="bg-gray-100 text-gray-600 text-xs font-medium px-2.5 py-1 rounded-full">
+            {{ typeLabel }}
+          </span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Stats grid -->
+    <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-8">
+      @if (p.bedrooms !== null && p.bedrooms !== undefined) {
+        <div class="bg-gray-50 rounded-xl p-4 text-center">
+          <svg class="w-6 h-6 mx-auto mb-1 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+          </svg>
+          <p class="text-lg font-bold text-gray-900">{{ p.bedrooms === 0 ? 'Studio' : p.bedrooms }}</p>
+          <p class="text-xs text-gray-500">Bedrooms</p>
+        </div>
+      }
+      @if (p.bathrooms) {
+        <div class="bg-gray-50 rounded-xl p-4 text-center">
+          <svg class="w-6 h-6 mx-auto mb-1 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M4 12h16M4 12a8 8 0 0116 0M4 12a8 8 0 0016 0M3 21h18M3 7h18" />
+          </svg>
+          <p class="text-lg font-bold text-gray-900">{{ p.bathrooms }}</p>
+          <p class="text-xs text-gray-500">Bathrooms</p>
+        </div>
+      }
+      @if (p.areaSqft) {
+        <div class="bg-gray-50 rounded-xl p-4 text-center">
+          <svg class="w-6 h-6 mx-auto mb-1 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4" />
+          </svg>
+          <p class="text-lg font-bold text-gray-900">{{ p.areaSqft }}</p>
+          <p class="text-xs text-gray-500">Sq Ft</p>
+        </div>
+      }
+      @if (p.availableFrom) {
+        <div class="bg-gray-50 rounded-xl p-4 text-center">
+          <svg class="w-6 h-6 mx-auto mb-1 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+          </svg>
+          <p class="text-lg font-bold text-gray-900">{{ p.availableFrom | date: 'MMM d' }}</p>
+          <p class="text-xs text-gray-500">Available</p>
+        </div>
+      }
+    </div>
+
+    <!-- Description -->
+    @if (p.description) {
+      <div class="mb-8">
+        <h2 class="text-lg font-semibold text-gray-900 mb-3">About this property</h2>
+        <p class="text-gray-600 leading-relaxed whitespace-pre-line">{{ p.description }}</p>
+      </div>
+    }
+
+    <!-- Additional image gallery -->
+    @if (p.images && p.images.length > 1) {
+      <div class="mb-8">
+        <h2 class="text-lg font-semibold text-gray-900 mb-3">Photos</h2>
+        <div class="grid grid-cols-2 md:grid-cols-3 gap-3">
+          @for (img of p.images.slice(1); track img) {
+            <div class="rounded-lg overflow-hidden h-40 bg-gray-100">
+              <img [src]="img" [alt]="p.title" class="w-full h-full object-cover" />
+            </div>
+          }
+        </div>
+      </div>
+    }
+
+  </div>
+}

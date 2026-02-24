@@ -1,0 +1,9 @@
+@if (!isAdminRoute && !isAuthRoute) {
+  <app-navbar />
+}
+
+<router-outlet />
+
+@if (!isAdminRoute && !isAuthRoute) {
+  <app-footer />
+}
